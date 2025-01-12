@@ -1,12 +1,26 @@
 use std::net::TcpListener;
+use std::io::Read;
+fn main() -> std::io::Result<()> {
 
-fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878")?;
+    println!("Sever is listening on port 7878");
 
-    
+    for stream in listener.incoming() {
+        match stream {
+            Ok(mut stream) => {
+                println!("New connection established");
 
+                let mut buffer = [0; 1024];
 
-    // Your code here:
-    // 1. Create a TcpListener that binds to "127.0.0.1:7878"
-    // 2. Use a for loop to iterate over incoming connections
-    // 3. Print something when a connection is received}
+                stream.read(&mut buffer)?;
+
+                let request = String::from_utf8_lossy(&buffer[..]);
+                println!("Recieved: {}", request);
+            }
+            Err(e) => {
+                println!("Error: {}", e);
+            }
+        }
+    }
+    Ok(())
 }
